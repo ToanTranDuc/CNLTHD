@@ -1,0 +1,74 @@
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+.m2/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Gradle
+.gradle/
+build/
+gradle/
+
+# Logs
+*.log
+logs/
+
+# Spring Boot
+application-dev.properties
+application-prod.properties
+*.pid
+
+# Database
+*.db
+*.sqlite
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Runtime data
+pids
+*.pid.lock
+
+# Covers JetBrains IDEs
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+settings.json
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+out/
+
+# Test coverage
+.coverage
+htmlcov/

@@ -1,0 +1,179 @@
+# ========================================
+# DOCKER COMPOSE - Notification Service Stack
+# Chạy toàn bộ hệ thống với các dependencies
+# ========================================
+
+services:
+
+  # ========================================
+  # 1. ZOOKEEPER - Kafka Coordination
+  # ========================================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: notification-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181           # Zookeeper client port
+      ZOOKEEPER_TICK_TIME: 2000             # Zookeeper tick time (ms)
+    ports:
+      - "2181:2181"                         # Expose port 2181
+    networks:
+      - microservices-network
+    labels:
+      description: "Apache Zookeeper for Kafka"
+
+  # ========================================
+  # 2. KAFKA - Message Broker
+  # ========================================
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: notification-kafka
+    depends_on:
+      - zookeeper
+    environment:
+      # Kafka Broker Configuration
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      
+      # Advertised Listeners
+      # PLAINTEXT://kafka:29092 - Internal communication
+      # PLAINTEXT_HOST://kafka:9092 - External communication
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      
+      # Replication & Topics
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    ports:
+      - "9092:9092"        # External port (host side)
+      - "29092:29092"      # Internal port (container side)
+    networks:
+      - microservices-network
+    healthcheck:
+      test: kafka-broker-api-versions --bootstrap-server localhost:9092
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      description: "Apache Kafka Message Broker"
+
+  # ========================================
+  # 3. EUREKA SERVER - Service Discovery
+  # ========================================
+  # Commented out: springcloud/eureka image has compatibility issues
+  # Uncomment and use alternative image if needed
+  # eureka-server:
+  #   image: springcloud/eureka
+  #   container_name: notification-eureka
+  #   environment:
+  #     eureka.instance.hostname: eureka-server
+  #     eureka.client.registerWithEureka: 'false'
+  #     eureka.client.fetchRegistry: 'false'
+  #   ports:
+  #     - "8761:8761"
+  #   networks:
+  #     - microservices-network
+
+  # ========================================
+  # 4. PROMETHEUS - Metrics Collection
+  # ========================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: notification-prometheus
+    ports:
+      - "9090:9090"  # Prometheus Web UI
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      description: "Prometheus Time Series Database"
+
+  # ========================================
+  # 5. ZIPKIN - Distributed Tracing
+  # ========================================
+  # Commented out: Optional for basic testing
+  # Uncomment if distributed tracing needed
+  # zipkin:
+  #   image: openzipkin/zipkin:latest
+  #   container_name: notification-zipkin
+  #   ports:
+  #     - "9411:9411"  # Zipkin Web UI
+  #   environment:
+  #     STORAGE_TYPE: mem  # In-memory storage (development only)
+  #   networks:
+  #     - microservices-network
+  #   healthcheck:
+  #     test: [ "CMD", "curl", "-f", "http://localhost:9411/health" ]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #   labels:
+  #     description: "Zipkin Distributed Tracing"
+
+  # ========================================
+  # 6. NOTIFICATION SERVICE - Main App
+  # ========================================
+  notification-service:
+    build:
+      context: .                # Build from current directory
+      dockerfile: Dockerfile    # Use Dockerfile
+    image: notification-service:1.0.0
+    container_name: notification-service
+    ports:
+      - "8083:8083"  # Application port
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      # Kafka Configuration
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      
+      # Zipkin: Disabled for local testing
+      # MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      # MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
+      
+      # Eureka: Disabled for local testing
+      EUREKA_CLIENT_ENABLED: 'false'
+      SPRING_PROFILES_ACTIVE: docker
+      
+      # Logging
+      LOGGING_LEVEL_COM_HDBANK_NOTIFICATIONSERVICE: DEBUG
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/api/v1/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      description: "Notification Service - Main Application"
+    restart: on-failure
+
+# ========================================
+# NETWORKS - Service Communication
+# ========================================
+networks:
+  microservices-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ========================================
+# VOLUMES - Data Persistence
+# ========================================
+volumes:
+  prometheus_data:
+    driver: local
+
