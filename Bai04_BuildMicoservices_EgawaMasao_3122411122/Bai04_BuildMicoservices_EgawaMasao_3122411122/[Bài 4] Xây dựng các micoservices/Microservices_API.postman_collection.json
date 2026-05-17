@@ -1,0 +1,417 @@
+{
+  "info": {
+    "_postman_id": "microservices-api-collection",
+    "name": "Microservices API Testing",
+    "description": "Complete API collection for testing Order, Product, Inventory services inter-service communication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Eureka Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{EUREKA_URL}}/actuator/health",
+              "host": ["{{EUREKA_URL}}"],
+              "path": ["actuator", "health"]
+            },
+            "description": "Check if Eureka service is up and running"
+          },
+          "response": []
+        },
+        {
+          "name": "Product Service Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{PRODUCT_URL}}/actuator/health",
+              "host": ["{{PRODUCT_URL}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Inventory Service Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{INVENTORY_URL}}/actuator/health",
+              "host": ["{{INVENTORY_URL}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Order Service Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{ORDER_URL}}/actuator/health",
+              "host": ["{{ORDER_URL}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Product Service",
+      "item": [
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Laptop\",\n  \"price\": 1299.99,\n  \"description\": \"High-performance laptop\"\n}"
+            },
+            "url": {
+              "raw": "{{PRODUCT_URL}}/api/products",
+              "host": ["{{PRODUCT_URL}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{PRODUCT_URL}}/api/products",
+              "host": ["{{PRODUCT_URL}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{PRODUCT_URL}}/api/products/1",
+              "host": ["{{PRODUCT_URL}}"],
+              "path": ["api", "products", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{PRODUCT_URL}}/api/products/search?name=Test",
+              "host": ["{{PRODUCT_URL}}"],
+              "path": ["api", "products", "search"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Test"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Laptop\",\n  \"price\": 1499.99,\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{PRODUCT_URL}}/api/products/1",
+              "host": ["{{PRODUCT_URL}}"],
+              "path": ["api", "products", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{PRODUCT_URL}}/api/products/1",
+              "host": ["{{PRODUCT_URL}}"],
+              "path": ["api", "products", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Inventory Service",
+      "item": [
+        {
+          "name": "Create/Update Inventory",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skuCode\": \"SKU-LAPTOP-001\",\n  \"quantity\": 100\n}"
+            },
+            "url": {
+              "raw": "{{INVENTORY_URL}}/api/inventory/updateQuantity",
+              "host": ["{{INVENTORY_URL}}"],
+              "path": ["api", "inventory", "updateQuantity"]
+            },
+            "description": "Create or update inventory item. This request should be run BEFORE placing an order."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Inventory",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{INVENTORY_URL}}/api/inventory",
+              "host": ["{{INVENTORY_URL}}"],
+              "path": ["api", "inventory"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Inventory by SKU Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{INVENTORY_URL}}/api/inventory/SKU-LAPTOP-001",
+              "host": ["{{INVENTORY_URL}}"],
+              "path": ["api", "inventory", "SKU-LAPTOP-001"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Stock Availability",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{INVENTORY_URL}}/api/inventory/check?skuCode=SKU-LAPTOP-001&quantity=10",
+              "host": ["{{INVENTORY_URL}}"],
+              "path": ["api", "inventory", "check"],
+              "query": [
+                {
+                  "key": "skuCode",
+                  "value": "SKU-LAPTOP-001"
+                },
+                {
+                  "key": "quantity",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Check if specific quantity of product is in stock. Returns true/false"
+          },
+          "response": []
+        },
+        {
+          "name": "Decrease Inventory",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skuCode\": \"SKU-LAPTOP-001\",\n  \"quantity\": 5\n}"
+            },
+            "url": {
+              "raw": "{{INVENTORY_URL}}/api/inventory/decrease",
+              "host": ["{{INVENTORY_URL}}"],
+              "path": ["api", "inventory", "decrease"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Order Service (Inter-Service Communication)",
+      "item": [
+        {
+          "name": "Place Order - With Available Stock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-001\",\n  \"skuCode\": \"SKU-LAPTOP-001\",\n  \"quantity\": 2,\n  \"price\": 1299.99,\n  \"userDetails\": {\n    \"email\": \"customer1@example.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{ORDER_URL}}/api/order",
+              "host": ["{{ORDER_URL}}"],
+              "path": ["api", "order"]
+            },
+            "description": "Place an order. Order Service will call Inventory Service to check stock.\nIMPORTANT: Create inventory first using 'Create/Update Inventory' request"
+          },
+          "response": []
+        },
+        {
+          "name": "Place Order - Without Available Stock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"ORD-999\",\n  \"skuCode\": \"SKU-NONEXISTENT\",\n  \"quantity\": 1000,\n  \"price\": 999.99,\n  \"userDetails\": {\n    \"email\": \"customer2@example.com\",\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{ORDER_URL}}/api/order",
+              "host": ["{{ORDER_URL}}"],
+              "path": ["api", "order"]
+            },
+            "description": "Try to place order with SKU that doesn't exist or insufficient quantity. Should return error."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "EUREKA_URL",
+      "value": "http://localhost:8761",
+      "type": "string"
+    },
+    {
+      "key": "PRODUCT_URL",
+      "value": "http://localhost:8082",
+      "type": "string"
+    },
+    {
+      "key": "INVENTORY_URL",
+      "value": "http://localhost:8083",
+      "type": "string"
+    },
+    {
+      "key": "ORDER_URL",
+      "value": "http://localhost:8084",
+      "type": "string"
+    }
+  ]
+}
